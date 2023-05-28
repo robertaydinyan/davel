@@ -65,6 +65,18 @@ class ItemController extends Controller
         ]);
     }
 
+    public function actionGetNames($term) {
+        $items = Item::find()
+            ->select('name')
+            ->where(['like', 'name', $term])
+            ->column();
+        return \yii\helpers\Json::encode($items);
+    }
+
+    public function actionSearch() {
+        var_dump("dsafgds");
+    }
+
     /**
      * Displays a single Item model.
      * @param int $id ID

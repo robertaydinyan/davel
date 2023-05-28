@@ -45,6 +45,8 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'search' => 'api/search',
+//                '<controller:[\w\-]+>/<action:[\w\-]+>' => '<controller>/<action>',
             ],
         ],
     ],

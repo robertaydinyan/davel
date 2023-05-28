@@ -2,15 +2,15 @@
 
 namespace app\models;
 
-use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Item;
-
 /**
  * ItemSearch represents the model behind the search form of `app\models\Item`.
  */
 class ItemSearch extends Item
 {
+    public $order;
+    public $price_lower;
+    public $price_upper;
     /**
      * {@inheritdoc}
      */
@@ -25,10 +25,8 @@ class ItemSearch extends Item
     /**
      * {@inheritdoc}
      */
-    public function scenarios()
-    {
-        // bypass scenarios() implementation in the parent class
-        return Model::scenarios();
+    public function scenarios() {
+        return parent::scenarios();
     }
 
     /**
@@ -41,7 +39,6 @@ class ItemSearch extends Item
     public function search($params)
     {
         $query = Item::find();
-
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
@@ -49,7 +46,11 @@ class ItemSearch extends Item
         ]);
 
         $this->load($params);
-
+        if (isset($params['ItemSearch'])) {
+            $this->order = $params['ItemSearch']['order'];
+            $this->price_lower = $params['ItemSearch']['price_lower'];
+            $this->price_upper = $params['ItemSearch']['price_upper'];
+        }
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
@@ -64,15 +65,28 @@ class ItemSearch extends Item
         ]);
 
 
-        $query->andFilterWhere(['like', 'name', $this->name]);
-        $this->price && $query->andFilterWhere(['and',
-            ['>=', 'price', $this->price['lower']],
-            ['<=', 'price', $this->price['upper']]
+        $query->andFilterWhere(['like', 'item.name', $this->name]);
+        $query->andFilterWhere(['and',
+            ['>=', 'price', $this->price_lower],
+            ['<=', 'price', $this->price_upper]
         ]);
+        $query->joinWith('seller');
 
         $rate = isset($this->seller_id) ? $this->seller_id['rate'] : null;
         if ($rate) {
-            $query->joinWith('seller')->andFilterWhere(['>=', 'rate', $rate]);
+            $query->andFilterWhere(['>=', 'rate', $rate]);
+        }
+
+        switch ($this->order) {
+            case 1:
+                $query->orderBy(['price' => SORT_ASC]);
+                break;
+            case 2:
+                $query->orderBy(['price' => SORT_DESC]);
+                break;
+            case 3:
+                $query->orderBy(['seller.rate' => SORT_ASC]);
+                break;
         }
         return $dataProvider;
     }

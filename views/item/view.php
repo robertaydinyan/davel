@@ -15,26 +15,37 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
 
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
             'id',
             'name',
-            'category_id',
+            [
+                'label' => 'Category',
+                'value' => function($model) {
+                    return $model->category->name;
+                }
+            ],
             'price',
-            'location_id',
-            'seller_id',
+            [
+                'label' => 'Seller',
+                'value' => function($model) {
+                    return $model->seller->name;
+                }
+            ],
+            [
+                'label' => 'Location',
+                'value' => function($model) {
+                    return $model->location->name;
+                }
+            ],
+            [
+                'label' => 'Seller Rate',
+                'value' => function($model) {
+                    return $model->seller->rate;
+                }
+            ]
         ],
     ]) ?>
 
